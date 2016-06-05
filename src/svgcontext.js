@@ -8,16 +8,24 @@
 
 /** @constructor */
 Vex.Flow.SVGContext = (function() {
-  function SVGContext(element) {
+  function SVGContext(element, options) {
     if (arguments.length > 0) this.init(element);
   }
 
   SVGContext.addPrefix = Vex.Prefix;
 
   SVGContext.prototype = {
-    init: function(element) {
+    init: function(element, options) {
       // element is the parent DOM object
       this.element = element;
+
+      // options:
+      // when scaleToContainer is set to true, the svg is set to fill
+      // its container element width.  This allows responsive resizing
+      // of the SVG when its container div changes size.
+      this.options = options || {};
+      Vex.Merge(this.options, { scaleToContainer: false });
+
       // Create the SVG in the SVG namespace:
       this.svgNS = "http://www.w3.org/2000/svg";
       var svg = this.create("svg");
@@ -230,12 +238,20 @@ Vex.Flow.SVGContext = (function() {
     resize: function(width, height) {
       this.width = width;
       this.height = height;
-      this.element.style.width = width;
-      var attributes = {
-        width : width,
-        height : height
-      };
-      this.applyAttributes(this.svg, attributes);
+
+      this.setViewBox(
+        0, 0, 
+        this.width / this.state.scale.x, this.height / this.state.scale.y
+      );
+
+      if(!this.options.scaleToContainer) {
+        this.element.style.width = width + "px";
+        var attributes = {
+          width : width,
+          height : height
+        };
+        this.applyAttributes(this.svg, attributes);
+      }
       return this;
     },
 

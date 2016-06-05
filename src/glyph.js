@@ -49,7 +49,6 @@ Vex.Flow.Glyph = (function() {
       this.reset();
     },
 
-    setPoint: function(point) { this.point = point; return this; },
     setStave: function(stave) { this.stave = stave; return this; },
     setXShift: function(x_shift) { this.x_shift = x_shift; return this; },
     setYShift: function(y_shift) { this.y_shift = y_shift; return this; },
@@ -78,6 +77,23 @@ Vex.Flow.Glyph = (function() {
       };
     },
 
+    // Get/set the glyph's style
+    //
+    // `style` is an `object` with the following properties: `shadowColor`,
+    // `shadowBlur`, `fillStyle`, `strokeStyle`
+    getStyle: function() { return this.style; },
+    setStyle: function(style) { this.style = style; return this; },
+    applyStyle: function(context) {
+      var style = this.getStyle();
+      if(typeof style === "undefined") return;
+      if (style.shadowColor) context.setShadowColor(style.shadowColor);
+      if (style.shadowBlur) context.setShadowBlur(style.shadowBlur);
+      if (style.fillStyle) context.setFillStyle(style.fillStyle);
+      if (style.strokeStyle) context.setStrokeStyle(style.strokeStyle);
+      return this;
+    },
+
+
     render: function(ctx, x_pos, y_pos) {
       if (!this.metrics) throw new Vex.RuntimeError("BadGlyph", "Glyph " +
           this.code + " is not initialized.");
@@ -85,7 +101,10 @@ Vex.Flow.Glyph = (function() {
       var outline = this.metrics.outline;
       var scale = this.scale;
 
+      ctx.save();
+      this.applyStyle(ctx);
       Glyph.renderOutline(ctx, outline, scale, x_pos, y_pos);
+      ctx.restore();
     },
 
     renderToStave: function(x) {
@@ -96,9 +115,11 @@ Vex.Flow.Glyph = (function() {
 
       var outline = this.metrics.outline;
       var scale = this.scale;
-
+      ctx.save();
+      this.applyStyle(this.context);
       Glyph.renderOutline(this.context, outline, scale,
           x + this.x_shift, this.stave.getYForGlyphs() + this.y_shift);
+      this.context.restore();
     }
   };
 
