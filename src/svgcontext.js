@@ -6,18 +6,30 @@
 // Copyright Mohit Muthanna 2015
 // @author Gregory Ristow (2015)
 
+/* @param element: a dom element, to which the SVG will be added
+ * @param options: {
+ *    scaleToContainer: bool, default false
+ *      when true, the SVG will scale to whatever width is set
+ *      on the parent DOM element or the SVG itself. By adding
+ *      classes, for instance, SVG's can flow within a responsive
+ *      layout.
+ * }
+ */
 /** @constructor */
 Vex.Flow.SVGContext = (function() {
-  function SVGContext(element) {
-    if (arguments.length > 0) this.init(element);
+  function SVGContext(element, options) {
+    if (arguments.length > 0) this.init(element, options);
   }
 
   SVGContext.addPrefix = Vex.Prefix;
 
   SVGContext.prototype = {
-    init: function(element) {
+    init: function(element, options) {
       // element is the parent DOM object
       this.element = element;
+
+      this.options = options || { scaleToContainer: false };
+
       // Create the SVG in the SVG namespace:
       this.svgNS = "http://www.w3.org/2000/svg";
       var svg = this.create("svg");
@@ -223,19 +235,31 @@ Vex.Flow.SVGContext = (function() {
 
     // ### Sizing & Scaling Methods:
 
-    // TODO (GCR): See note at scale() -- seperate our internal
-    // conception of pixel-based width/height from the style.width
-    // and style.height properties eventually to allow users to
-    // apply responsive sizing attributes to the SVG.
+    // Here we set what portion of the svg will be visible, the
+    // SVG viewbox. If options.scaleToContainer is false, we
+    // will also resize the svg element itself to match the number
+    // of pixels specified in width/height. (This preserves 
+    // compatibility with CanvasContext, but is probably not the
+    // best option for modern web design.) Otherwise, the SVG
+    // will scale based on its & its parents style properties.
     resize: function(width, height) {
       this.width = width;
       this.height = height;
-      this.element.style.width = width;
-      var attributes = {
-        width : width,
-        height : height
-      };
-      this.applyAttributes(this.svg, attributes);
+      this.setViewBox(0, 0, 
+        this.width/this.state.scale.x,
+        this.height/this.state.scale.y);
+
+      if(!this.options.scaleToContainer){
+        var attributes = {
+          width : width,
+          height : height
+        };
+        this.applyAttributes(this.svg, attributes);
+        Vex.Merge(this.svg.style, {
+          width: width + "px", 
+          height: height + "px"}
+        );
+      }
       return this;
     },
 
@@ -262,8 +286,10 @@ Vex.Flow.SVGContext = (function() {
 
     setViewBox: function(xMin, yMin, width, height) {
       // Override for "x y w h" style:
-      if(arguments.length == 1) this.svg.setAttribute("viewBox", viewBox);
-      else {
+      if(arguments.length === 1){
+        var viewBox = xMin;
+        this.svg.setAttribute("viewBox", viewBox);
+      } else {
         var viewBoxString = xMin + " " + yMin + " " + width + " " + height;
         this.svg.setAttribute("viewBox", viewBoxString);
       }
