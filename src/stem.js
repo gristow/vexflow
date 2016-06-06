@@ -145,6 +145,7 @@ Vex.Flow.Stem = (function() {
 
       // Draw the stem
       ctx.save();
+      ctx.openGroup("stem");
       this.applyStyle(ctx);
       ctx.beginPath();
       ctx.setLineWidth(Stem.WIDTH);
@@ -152,6 +153,7 @@ Vex.Flow.Stem = (function() {
       ctx.lineTo(stem_x, stem_y - this.getHeight());
       ctx.stroke();
       ctx.restore();
+      ctx.closeGroup();
     }
   };
 
