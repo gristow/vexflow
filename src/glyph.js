@@ -77,6 +77,22 @@ Vex.Flow.Glyph = (function() {
         height: this.metrics.ha * this.scale
       };
     },
+    // Get/set the glyph's style
+    //
+    // `style` is an `object` with the following properties: `shadowColor`,
+    // `shadowBlur`, `fillStyle`, `strokeStyle`
+    getStyle: function() { return this.style; },
+    setStyle: function(style) { this.style = style; return this; },
+    applyStyle: function(context) {
+      var style = this.getStyle();
+      if(typeof style === "undefined") return;
+      if (style.shadowColor) context.setShadowColor(style.shadowColor);
+      if (style.shadowBlur) context.setShadowBlur(style.shadowBlur);
+      if (style.fillStyle) context.setFillStyle(style.fillStyle);
+      if (style.strokeStyle) context.setStrokeStyle(style.strokeStyle);
+      return this;
+    },
+
 
     render: function(ctx, x_pos, y_pos) {
       if (!this.metrics) throw new Vex.RuntimeError("BadGlyph", "Glyph " +
@@ -84,8 +100,10 @@ Vex.Flow.Glyph = (function() {
 
       var outline = this.metrics.outline;
       var scale = this.scale;
-
+      ctx.save();
+      this.applyStyle(ctx);
       Glyph.renderOutline(ctx, outline, scale, x_pos, y_pos);
+      ctx.restore();
     },
 
     renderToStave: function(x) {
