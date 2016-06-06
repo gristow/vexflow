@@ -85,6 +85,29 @@ Vex.Flow.Modifier = (function() {
     // Set the `text_line` for the modifier.
     setTextLine: function(line) { this.text_line = line; return this; },
 
+    // Get/set the modifier's style
+    //
+    // `style` is an `object` with the following properties:
+    // `shadowColor`, `shadowBlur`, `fillStyle`, `strokeStyle`
+    getStyle: function() { return this.style; },
+    setStyle: function(style) { this.style = style; return this; },
+    applyStyle: function(context) {
+      context = context || this.context;
+      var style = this.getStyle();
+      if(typeof style === "undefined") return;
+      if (style.shadowColor) context.setShadowColor(style.shadowColor);
+      if (style.shadowBlur) context.setShadowBlur(style.shadowBlur);
+      if (style.fillStyle) context.setFillStyle(style.fillStyle);
+      if (style.strokeStyle) context.setStrokeStyle(style.strokeStyle);
+      return this;
+    },
+
+    // Set font family, size, and weight. E.g., `Arial`, `10pt`, `Bold`.
+    setFont: function(family, size, weight) {
+      this.font = { family: family, size: size, weight: weight };
+      return this;
+    },
+
     // Shift modifier down `y` pixels. Negative values shift up.
     setYShift: function(y) { this.y_shift = y; return this; },
 
