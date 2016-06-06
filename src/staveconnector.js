@@ -29,7 +29,7 @@ Vex.Flow.StaveConnector = (function() {
 
   StaveConnector.prototype = {
     init: function(top_stave, bottom_stave) {
-      this.thickness = Vex.Flow.STAVE_LINE_THICKNESS;
+      this.thickness = Vex.Flow.Stave.LINE_THICKNESS;
       this.width = 3;
       this.top_stave = top_stave;
       this.bottom_stave = bottom_stave;

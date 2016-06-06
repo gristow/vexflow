@@ -342,13 +342,15 @@ VF.Test.StaveNote = (function() {
       equal(props[2].line, 2.5, "A/4 on line 2.5");
 
       var stave = new VF.Stave(10, 10, 300);
+      stave.noteYCenteringOffset = -0.25;
+      
       note.setStave(stave);
 
       var ys = note.getYs();
       equal(ys.length, 3, "Chord should be rendered on three lines");
-      equal(ys[0], 100, "Line for C/4");
-      equal(ys[1], 90, "Line for E/4");
-      equal(ys[2], 75, "Line for A/4");
+      equal(ys[0], 100 - 0.25, "Line for C/4");
+      equal(ys[1], 90 - 0.25, "Line for E/4");
+      equal(ys[2], 75 - 0.25, "Line for A/4");
     },
 
     width: function() {

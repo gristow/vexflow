@@ -25,7 +25,7 @@ Vex.Flow.Barline = (function() {
   Vex.Inherit(Barline, Vex.Flow.StaveModifier, {
     init: function(type) {
       Barline.superclass.init.call(this);
-      this.thickness = Vex.Flow.STAVE_LINE_THICKNESS;
+      this.thickness = Vex.Flow.Stave.LINE_THICKNESS;
 
       var TYPE = Vex.Flow.Barline.type;
       this.widths = {};

@@ -17,11 +17,12 @@ VF.Test.TabStave = (function() {
           400, 160);
 
       var stave = new VF.TabStave(10, 10, 300);
+      stave.noteYCenteringOffset = -0.25;
       stave.setNumLines(6);
       stave.setContext(ctx);
       stave.draw();
 
-      equal(stave.getYForNote(0), 127, "getYForNote(0)");
+      equal(stave.getYForNote(0), 127 - 0.25, "getYForNote(0)");
       equal(stave.getYForLine(5), 126, "getYForLine(5)");
       equal(stave.getYForLine(0), 61, "getYForLine(0) - Top Line");
       equal(stave.getYForLine(4), 113, "getYForLine(4) - Bottom Line");

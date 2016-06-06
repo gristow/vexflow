@@ -312,6 +312,7 @@ Vex.Flow.StaveNote = (function() {
       var glyph = this.getGlyph();
 
       var y_extend = 0;
+      // if note_head is a solid or hollow x, extend the glyph:
       if (glyph.code_head == "v95" || glyph.code_head == "v3e") {
          y_extend = -4;
       }
@@ -833,7 +834,9 @@ Vex.Flow.StaveNote = (function() {
       var head_x = this.note_heads[0].getAbsoluteX();
 
       var that = this;
-      function stroke(y) {
+      function stroke(noteLine) {
+        var staveLine = -noteLine + 5;
+        var  y = that.stave.getYForLine(staveLine);
         if (that.use_default_head_x === true)  {
           head_x = that.getAbsoluteX() + that.x_shift;
         }
@@ -846,11 +849,11 @@ Vex.Flow.StaveNote = (function() {
 
       var line; // iterator
       for (line = 6; line <= highest_line; ++line) {
-        stroke(this.stave.getYForNote(line));
+        stroke(line);
       }
 
       for (line = 0; line >= lowest_line; --line) {
-        stroke(this.stave.getYForNote(line));
+        stroke(line);
       }
     },
 

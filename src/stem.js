@@ -129,14 +129,26 @@ Vex.Flow.Stem = (function() {
       var stem_x, stem_y;
       var stem_direction = this.stem_direction;
 
+     /* This next bit has some very strange numbers -- and they
+      * are not mathematically derived from anything. Rather,
+      * these are offsets having to do with how close to the
+      * edge of their defined font space the circles of the
+      * quarter-note/eighth-note/etc... and half-note note head
+      * glyphs actually come.
+      */
       if (stem_direction == Stem.DOWN) {
+        var stemDownCorrectionX = 0.0045;
+        var stemDownCorrectionY = 1.1;
         // Down stems are rendered to the left of the head.
-        stem_x = this.x_begin + (Stem.WIDTH / 2);
-        stem_y = this.y_top + 2;
+        stem_x = this.x_begin + (Stem.WIDTH / 2) + stemDownCorrectionX;
+        stem_y = this.y_top + stemDownCorrectionY;
       } else {
         // Up stems are rendered to the right of the head.
-        stem_x = this.x_end + (Stem.WIDTH / 2);
-        stem_y = this.y_bottom - 2;
+        // 0.035 because 
+        var stemUpCorrectionX = 0.036;
+        var stemUpCorrectionY = -1.07;
+        stem_x = this.x_end + (Stem.WIDTH / 2) + stemUpCorrectionX;
+        stem_y = this.y_bottom + stemUpCorrectionY;
       }
 
       stem_y += this.y_extend * stem_direction;

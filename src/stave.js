@@ -9,10 +9,12 @@ Vex.Flow.Stave = (function() {
     if (arguments.length > 0) this.init(x, y, width, options);
   }
 
-  var THICKNESS = (Vex.Flow.STAVE_LINE_THICKNESS > 1 ?
-        Vex.Flow.STAVE_LINE_THICKNESS : 0);
+  Stave.LINE_THICKNESS = 2;
+  Stave.FILL_STYLE = "#999999";
+
   Stave.prototype = {
     init: function(x, y, width, options) {
+      this.THICKNESS = Math.max(Stave.LINE_THICKNESS, 0);
       this.x = x;
       this.y = y;
       this.width = width;
@@ -32,7 +34,7 @@ Vex.Flow.Stave = (function() {
         vertical_bar_width: 10,       // Width around vertical bar end-marker
         glyph_spacing_px: 10,
         num_lines: 5,
-        fill_style: "#999999",
+        fill_style: Stave.FILL_STYLE,
         left_bar: true,               // draw vertical bar on left
         right_bar: true,               // draw vertical bar on right
         spacing_between_lines_px: 10, // in pixels
@@ -40,6 +42,9 @@ Vex.Flow.Stave = (function() {
         space_below_staff_ln: 4,      // in staff lines
         top_text_position: 1          // in staff lines
       };
+      this.noteYCenteringOffset = // see note at this.getYForNote
+        (typeof Stave.noteYCenteringOffset === "undefined") ?
+        -0.2395 : Stave.noteYCenteringOffset;
       this.bounds = {x: this.x, y: this.y, w: this.width, h: 0};
       Vex.Merge(this.options, options);
 
@@ -216,10 +221,11 @@ Vex.Flow.Stave = (function() {
       var headroom = options.space_above_staff_ln;
 
       var y = this.y + ((line * spacing) + (headroom * spacing)) -
-        (THICKNESS / 2);
+        (this.THICKNESS / 2);
 
       return y;
     },
+
 
     getLineForY: function(y){
       //Does the revers of getYForLine - somewhat dumb and just calls getYForLine until the right value is reaches
@@ -227,7 +233,7 @@ Vex.Flow.Stave = (function() {
       var options = this.options;
       var spacing = options.spacing_between_lines_px;
       var headroom = options.space_above_staff_ln;
-      return ((y - this.y + (THICKNESS / 2)) / spacing) - headroom;
+      return ((y - this.y + (this.THICKNESS / 2)) / spacing) - headroom;
     },
 
     getYForTopText: function(line) {
@@ -240,12 +246,33 @@ Vex.Flow.Stave = (function() {
       return this.getYForLine(this.options.bottom_text_position + l);
     },
 
+   /*
+    * For notes, lines are calculated from the bottom -- which is
+    * opposite to how "line" is used in the rest of Stave. Here,
+    * line 1 = the bottom staff line. Thus, getYForLine will
+    * return a completely different result, since the top line
+    * for that is line 0.
+    *
+    * In other words: getYForLine(5) almost equals getYForNote(0).
+    */
     getYForNote: function(line) {
       var options = this.options;
       var spacing = options.spacing_between_lines_px;
       var headroom = options.space_above_staff_ln;
-      var y = this.y + (headroom * spacing) + (5 * spacing) - (line * spacing);
-
+      // noteYCenteringOffset accounts for the slight difference
+      // between the stated bounds of a note_head's glyph and the
+      // actual highest/lowest pixel drawn. Unfortunately because
+      // SVG strokes are drawn slightly differently from Canvas
+      // strokes, it's not perfect for either, but it's pretty darn
+      // close. (Perfect for SVG is -0.289; for Canvas -.19, so we
+      // split the difference.)
+      //
+      // If one wants to be very fussy, this can be overriden by
+      // setting Vex.Flow.Stave.noteYCenteringOffset to change
+      // it globally, or by setting the noteYCenteringOffset
+      // property on any staff.
+      var noteYCenteringOffset = this.noteYCenteringOffset;
+      var y = this.y + (headroom * spacing) + (5 * spacing) - (line * spacing) + noteYCenteringOffset;
       return y;
     },
 
@@ -492,7 +519,7 @@ Vex.Flow.Stave = (function() {
         this.context.setFillStyle(this.options.fill_style);
         this.context.setStrokeStyle(this.options.fill_style);
         if (this.options.line_config[line].visible) {
-          this.context.fillRect(x, y, width, Vex.Flow.STAVE_LINE_THICKNESS);
+          this.context.fillRect(x, y, width, this.THICKNESS);
         }
         this.context.restore();
       }

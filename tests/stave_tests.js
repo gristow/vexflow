@@ -88,7 +88,8 @@ VF.Test.Stave = (function() {
       stave.setContext(ctx);
       stave.draw();
 
-      equal(stave.getYForNote(0), 100, "getYForNote(0)");
+      stave.noteYCenteringOffset = -0.25;
+      equal(stave.getYForNote(0), 100 - 0.25, "getYForNote(0)");
       equal(stave.getYForLine(5), 99, "getYForLine(5)");
       equal(stave.getYForLine(0), 49, "getYForLine(0) - Top Line");
       equal(stave.getYForLine(4), 89, "getYForLine(4) - Bottom Line");
