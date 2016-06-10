@@ -93,10 +93,10 @@ Vex.Flow.Glyph = (function() {
       return this;
     },
 
-
     render: function(ctx, x_pos, y_pos) {
       if (!this.metrics) throw new Vex.RuntimeError("BadGlyph", "Glyph " +
           this.code + " is not initialized.");
+      if (!ctx) throw new Vex.RERR("GlyphError", "No valid context");
 
       var outline = this.metrics.outline;
       var scale = this.scale;
@@ -107,16 +107,9 @@ Vex.Flow.Glyph = (function() {
     },
 
     renderToStave: function(x) {
-      if (!this.metrics) throw new Vex.RuntimeError("BadGlyph", "Glyph " +
-          this.code + " is not initialized.");
       if (!this.stave) throw new Vex.RuntimeError("GlyphError", "No valid stave");
-      if (!this.context) throw new Vex.RERR("GlyphError", "No valid context");
 
-      var outline = this.metrics.outline;
-      var scale = this.scale;
-
-      Glyph.renderOutline(this.context, outline, scale,
-          x + this.x_shift, this.stave.getYForGlyphs() + this.y_shift);
+      this.render(this.context, x + this.x_shift, this.stave.getYForGlyphs() + this.y_shift);
     }
   };
 
