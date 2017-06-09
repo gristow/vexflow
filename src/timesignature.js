@@ -174,10 +174,12 @@ Vex.Flow.TimeSignature = (function() {
       if (!this.x) throw new Vex.RERR("TimeSignatureError", "Can't draw time signature without x.");
       if (!this.stave) throw new Vex.RERR("TimeSignatureError", "Can't draw time signature without stave.");
 
+      this.stave.context.openGroup('time-signature');
       this.timeSig.glyph.setStave(this.stave);
       this.timeSig.glyph.setContext(this.stave.context);
       this.placeGlyphOnLine(this.timeSig.glyph, this.stave, this.timeSig.line);
       this.timeSig.glyph.renderToStave(this.x);
+      this.stave.context.closeGroup('time-signature');
     }
   });
 
