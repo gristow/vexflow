@@ -88,7 +88,12 @@ Vex.Flow.SVGContext = (function() {
       return document.createElementNS(this.svgNS, svgElementType);
     },
 
-    // Allow grouping elements in containers for interactivity.
+    /**
+     * 
+     * @param {string} cls className to add to the group
+     * @param {string} id idName to add to the group
+     * @param {Object} attrs as linked list
+     */
     openGroup: function(cls, id, attrs) {
       var group = this.create("g");
       this.groups.push(group);
