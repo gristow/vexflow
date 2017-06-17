@@ -6,15 +6,17 @@
 //
 // Requires: vex.js, vexmusic.js, note.js
 Vex.Flow.Beam = (function() {
-  function Beam(notes, auto_stem) {
-    if (arguments.length > 0) this.init(notes, auto_stem);
+  function Beam(notes, auto_stem, render_options) {
+    if (arguments.length > 0) this.init(notes, auto_stem, render_options);
   }
 
   var Stem = Vex.Flow.Stem;
 
   // ## Prototype Methods
   Beam.prototype = {
-    init: function(notes, auto_stem) {
+    init: function(notes, auto_stem, render_options) {
+      if (typeof render_options === 'undefined') render_options = {};
+      console.log('render_options', render_options);
       if (!notes || notes == []) {
         throw new Vex.RuntimeError("BadArguments", "No notes provided for beam.");
       }
@@ -71,7 +73,7 @@ Vex.Flow.Beam = (function() {
       this.notes = notes;
       this.beam_count = this.getBeamCount();
       this.break_on_indices = [];
-      this.render_options = {
+      this.render_options = Vex.Merge({
         beam_width: 5,
         max_slope: 0.25,
         min_slope: -0.25,
@@ -82,7 +84,7 @@ Vex.Flow.Beam = (function() {
         partial_beam_length: 10,
         flat_beams: false,
         min_flat_beam_offset: 15
-      };
+      }, render_options);
     },
 
     // The the rendering `context`
@@ -95,7 +97,7 @@ Vex.Flow.Beam = (function() {
     getBeamCount: function(){
       return this.notes
       .map(function(note) {
-        return note.getGlyph().beam_count;
+        return note.getBeamCount();
       })
       .reduce(function(max, beamCount) {
           return beamCount > max ? beamCount : max;
@@ -276,6 +278,7 @@ Vex.Flow.Beam = (function() {
         // Don't go all the way to the top (for thicker stems)
         var y_displacement = Vex.Flow.STEM_WIDTH;
 
+        console.log('stemlets? ' + this.render_options.show_stemlets);
         if (!note.hasStem()) {
           if (note.isRest() && this.render_options.show_stemlets) {
             var centerGlyphX = note.getCenterGlyphX();
@@ -332,11 +335,13 @@ Vex.Flow.Beam = (function() {
         var note = this.notes[i];
         var prev_note = this.notes[i-1];
         var next_note = this.notes[i+1];
-        var ticks = note.getIntrinsicTicks();
+        // If this a beamed rest, it should never have more than one beam:
+        var ticks = note.isRest() ? Vex.Flow.durationToTicks(8) : note.getIntrinsicTicks();
+        var noteHasThisBeam = ticks < Vex.Flow.durationToTicks(duration);
         var partial = determinePartialSide(prev_note, note, next_note, i);
 
         // Check whether to apply beam(s)
-        if (ticks < Vex.Flow.durationToTicks(duration)) {
+        if (noteHasThisBeam) {
           var stem_x = note.isRest() ? note.getCenterGlyphX() : note.getStemX();
 
           // If a beam hasn't been started, let's start it!
