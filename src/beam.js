@@ -16,7 +16,6 @@ Vex.Flow.Beam = (function() {
   Beam.prototype = {
     init: function(notes, auto_stem, render_options) {
       if (typeof render_options === 'undefined') render_options = {};
-      console.log('render_options', render_options);
       if (!notes || notes == []) {
         throw new Vex.RuntimeError("BadArguments", "No notes provided for beam.");
       }
@@ -278,7 +277,6 @@ Vex.Flow.Beam = (function() {
         // Don't go all the way to the top (for thicker stems)
         var y_displacement = Vex.Flow.STEM_WIDTH;
 
-        console.log('stemlets? ' + this.render_options.show_stemlets);
         if (!note.hasStem()) {
           if (note.isRest() && this.render_options.show_stemlets) {
             var centerGlyphX = note.getCenterGlyphX();
