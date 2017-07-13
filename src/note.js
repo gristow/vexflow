@@ -137,7 +137,7 @@ Vex.Flow.Note = (function() {
       this.stave = null;
       this.render_options = {
         annotation_spacing: 5,
-        stave_padding: 12
+        stave_padding: 12,
       };
     },
 
@@ -333,7 +333,14 @@ Vex.Flow.Note = (function() {
       }
 
       if (this.isCenterAligned()){
+        // center_x_shift is the midpoint of the bar
         x += this.getCenterXShift();
+        if (this.stave) {
+          // StaveNote takes up left space -- get rid of it if we're centered.
+          x -= this.render_options.stave_padding;
+          // Get rid of any left space the stave itself puts in:
+          x -= (this.stave.getNoteStartX() - this.stave.getX()) / 2;
+        }
       }
 
       return x;
