@@ -332,7 +332,7 @@ Vex.Flow.Formatter = (function() {
     // Calculate the minimum width required to align and format `voices`.
     preCalculateMinTotalWidth: function(voices) {
       // Cache results.
-      if (this.hasMinTotalWidth) return;
+      if (this.hasMinTotalWidth) return this.minTotalWidth;
 
       // Create tick contexts if not already created.
       if (!this.tContexts) {
