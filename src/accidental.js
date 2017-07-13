@@ -24,6 +24,7 @@ Vex.Flow.Accidental = (function(){
   //
   // Arrange accidentals inside a ModifierContext.
   Accidental.format = function(accidentals, state) {
+    console.log('state.left_shift', state.left_shift);
     var left_shift = state.left_shift;
     var accidental_spacing = 2;
 
@@ -43,11 +44,12 @@ Vex.Flow.Accidental = (function(){
       var stave = note.getStave();
       var props = note.getKeyProps()[acc.getIndex()];
       if (note != prev_note) {
-         // Iterate through all notes to get the displaced pixels
+         // Iterate through all pitches in chord to get the displaced pixels
          for (var n = 0; n < note.keys.length; ++n) {
             props_tmp = note.getKeyProps()[n];
             shiftL = (props_tmp.displaced ? note.getExtraLeftPx() : shiftL);
           }
+          console.log('shiftL', shiftL);
           prev_note = note;
       }
       if (stave !== null) {
@@ -269,7 +271,8 @@ Vex.Flow.Accidental = (function(){
     });
 
     // update the overall layout with the full width of the accidental shapes:
-    state.left_shift += total_shift;
+    // subtract shiftL, so it's not counted twice in the width of the staveNote.
+    state.left_shift += total_shift - shiftL;
   };
 
   // Helper function to determine whether two lines of accidentals collide vertically
