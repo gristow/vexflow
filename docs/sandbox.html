@@ -90,44 +90,30 @@
       <div class="example sandbox" example="sandbox">
         <textarea id="sandbox" class="editor"
                   style="width: 641px; height: 180px; ">
-// Get the rendering context
-var canvas = $("div.sandbox div.sandbox canvas")[0];
+VF = Vex.Flow;
 
-var renderer = new Vex.Flow.Renderer(canvas,
-Vex.Flow.Renderer.Backends.CANVAS);
-var ctx = renderer.getContext();
-renderer.resize(500, 300); // Resize and clear canvas
-ctx.setFont("Arial", 10, "").setBackgroundFillStyle("#eed");
+// Create an SVG renderer and attach it to the DIV element named "boo".
+var div = document.getElementById("vexCanvas")
+div.innerHTML = "";
+var renderer = new VF.Renderer(div, VF.Renderer.Backends.SVG);
 
-// Create and draw the tablature stave
-var tabstave = new Vex.Flow.TabStave(10, 0, 500);
-tabstave.addTabGlyph();
-tabstave.setContext(ctx).draw();
+// Configure the rendering context.
+renderer.resize(500, 500);
+var context = renderer.getContext();
+context.setFont("Arial", 10, "").setBackgroundFillStyle("#eed");
 
-// Create some notes
-var notes = [
-  // A single note
-  new Vex.Flow.TabNote({
-    positions: [{str: 3, fret: 7}],
-    duration: "q"}),
+// Create a stave of width 400 at position 10, 40 on the canvas.
+var stave = new VF.Stave(10, 40, 400);
 
-  // A chord with the note on the 3rd string bent
-  new Vex.Flow.TabNote({
-    positions: [{str: 2, fret: 10},
-                {str: 3, fret: 9}],
-    duration: "q"}).
-  addModifier(new Vex.Flow.Bend("Full"), 1),
+// Add a clef and time signature.
+stave.addClef("treble").addTimeSignature("4/4");
 
-  // A single note with a harsh vibrato
-  new Vex.Flow.TabNote({
-    positions: [{str: 2, fret: 5}],
-    duration: "h"}).
-  addModifier(new Vex.Flow.Vibrato().setHarsh(true).setVibratoWidth(70), 0)
-];
+// Connect it to the rendering context and draw!
+stave.setContext(context).draw();
 
-Vex.Flow.Formatter.FormatAndDraw(ctx, tabstave, notes);</textarea>
+</textarea>
         <p/>
-        <canvas width=625 height=160></canvas>
+        <div id="vexCanvas" width=625 height=160></div>
 
         <style>
         .editor {
