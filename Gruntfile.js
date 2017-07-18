@@ -132,7 +132,7 @@ module.exports = function(grunt) {
     watch: {
       scripts: {
         files: ['src/*', 'Gruntfile.js'],
-        tasks: ['concat:vexflow'],
+        tasks: ['concat:vexflow', 'copy:utheory'],
         options: {
           interrupt: true
         }
@@ -153,6 +153,16 @@ module.exports = function(grunt) {
             dest: RELEASE_DIR,
             cwd: BUILD_DIR,
             src    : ['*.js', 'docs/**', '*.map']
+          }
+        ]
+      },
+      utheory: {
+        files: [
+          {
+            expand: true,
+            dest: '../MusicLibraries/uTheory-library/dependencies/vex',
+            cwd: BUILD_DIR,
+            src    : ['*.js', '*.map']
           }
         ]
       }
