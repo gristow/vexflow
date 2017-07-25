@@ -91,6 +91,10 @@ Vex.Flow.Annotation = (function() {
     setJustification: function(justification) {
       this.justification = justification; return this; },
 
+    setY: function(y) {
+      this.y = y;
+    },
+
     // Render text beside the note.
     draw: function() {
       if (!this.context) throw new Vex.RERR("NoContext",
@@ -112,7 +116,7 @@ Vex.Flow.Annotation = (function() {
       // This is a hack to work around the inability to measure text height
       // in HTML5 Canvas (and SVG).
       var text_height = this.context.measureText("m").width;
-      var x, y;
+      var x, y = this.y;
 
       if (this.justification == Annotation.Justify.LEFT) {
         x = start.x;
@@ -134,23 +138,26 @@ Vex.Flow.Annotation = (function() {
       // for us.
       spacing = stave.getSpacingBetweenLines();
 
-      if (this.vert_justification == Annotation.VerticalJustify.BOTTOM) {
-        y = stave.getYForBottomText(this.text_line);
-        bBox = this.note.getBoundingBox();
-        var bottomY = bBox.y + bBox.h;
-        y = Math.max(y, bottomY + (spacing * (this.text_line + 1)) + text_height / 3);
-      } else if (this.vert_justification ==
-                 Annotation.VerticalJustify.CENTER) {
-        var yt = stave.getYForTopText(this.text_line) - 1;
-        var yb = stave.getYForBottomText(this.text_line);
-        y = yt + ( yb - yt ) / 2 + text_height / 2;
-      } else if (this.vert_justification ==
-                 Annotation.VerticalJustify.TOP) {
-        y = Math.min(stave.getYForTopText(this.text_line), this.note.getBoundingBox().y - (spacing * (this.text_line)) - text_height/3 );
-      } else /* CENTER_STEM */{
-        var extents = this.note.getStemExtents();
-        y = extents.topY + (extents.baseY - extents.topY) / 2 +
-          text_height / 2;
+      // If the y placement has been set manually, don't do this.
+      if (!y) {
+        if (this.vert_justification == Annotation.VerticalJustify.BOTTOM) {
+          y = stave.getYForBottomText(this.text_line);
+          bBox = this.note.getBoundingBox();
+          var bottomY = bBox.y + bBox.h;
+          y = Math.max(y, bottomY + (spacing * (this.text_line + 1)) + text_height / 3);
+        } else if (this.vert_justification ==
+                  Annotation.VerticalJustify.CENTER) {
+          var yt = stave.getYForTopText(this.text_line) - 1;
+          var yb = stave.getYForBottomText(this.text_line);
+          y = yt + ( yb - yt ) / 2 + text_height / 2;
+        } else if (this.vert_justification ==
+                  Annotation.VerticalJustify.TOP) {
+          y = Math.min(stave.getYForTopText(this.text_line), this.note.getBoundingBox().y - (spacing * (this.text_line)) - text_height/3 );
+        } else /* CENTER_STEM */{
+          var extents = this.note.getStemExtents();
+          y = extents.topY + (extents.baseY - extents.topY) / 2 +
+            text_height / 2;
+        }
       }
 
       L("Rendering annotation: ", this.text, x, y);
