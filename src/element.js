@@ -32,7 +32,14 @@ export class Element {
 
   // set the draw style of a stemmable note:
   setStyle(style) { this.style = style; return this; }
-  getStyle() { return this.style; }
+  getStyle() {
+    const defaultStyle = (this.constructor.getDefaultStyle) ?
+      this.constructor.getDefaultStyle() || {} : {};
+    if (Object.keys(defaultStyle).length) {
+      return Object.assign({}, defaultStyle, this.style || {});
+    }
+    return this.style;
+  }
 
   // Apply current style to Canvas `context`
   applyStyle(context = this.context, style = this.getStyle()) {

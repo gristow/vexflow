@@ -15,6 +15,16 @@ import { KeySignature } from './keysignature';
 import { TimeSignature } from './timesignature';
 import { Volta } from './stavevolta';
 
+const defaultStyle = {
+  strokeStyle: '#999999',
+  lineWidth: Flow.STAVE_LINE_THICKNESS,
+};
+
+const defaultLedgerLineStyle = {
+  strokeStyle: '#000000',
+  lineWidth: Flow.STAVE_LINE_THICKNESS * 1.5,
+};
+
 export class Stave extends Element {
   constructor(x, y, width, options) {
     super();
@@ -38,7 +48,8 @@ export class Stave extends Element {
       vertical_bar_width: 10,       // Width around vertical bar end-marker
       glyph_spacing_px: 10,
       num_lines: 5,
-      fill_style: '#999999',
+      stroke_style: '#999999',
+      line_width: 1,
       left_bar: true,               // draw vertical bar on left
       right_bar: true,               // draw vertical bar on right
       spacing_between_lines_px: 10, // in pixels
@@ -47,6 +58,13 @@ export class Stave extends Element {
       top_text_position: 1,          // in staff lines
     };
     this.bounds = { x: this.x, y: this.y, w: this.width, h: 0 };
+
+    if (options && options.fill_style) {
+      // eslint-disable-next-line no-console
+      console.warn('Stave.options.fill_style is disabled. Use Stave.options.stroke_style instead.');
+      options = Object.assign({ stroke_style: options.fill_style }, options);
+    }
+
     Vex.Merge(this.options, options);
 
     this.resetLines();
@@ -57,6 +75,28 @@ export class Stave extends Element {
     // end bar
     this.addEndModifier(new Barline(this.options.right_bar ? BARTYPE.SINGLE : BARTYPE.NONE));
   }
+
+  /**
+   * Set the default stave line style for all of VexFlow
+   * @param {Object} style a style object (see element.js setStyle)
+   * @param {number} [style.lineWidth] in pixels
+   * @param {string} [style.strokeStyle] color string such as '#999999'
+   */
+  static setDefaultStyle(style) {
+    Object.assign(defaultStyle, style);
+  }
+  static getDefaultStyle() { return defaultStyle || {}; }
+
+  /**
+   * Set the default ledger line style for all of VexFlow
+   * @param {Object} style a style object (see element.js setStyle)
+   * @param {number} [style.lineWidth] in pixels
+   * @param {string} [style.strokeStyle] color string such as '#999999'
+   */
+  static setDefaultLedgerLineStyle(style) {
+    Object.assign(defaultLedgerLineStyle, style);
+  }
+  static getDefaultLedgerLineStyle() { return defaultLedgerLineStyle || {}; }
 
   space(spacing) { return this.options.spacing_between_lines_px * spacing; }
 
@@ -137,11 +177,21 @@ export class Stave extends Element {
   }
 
   getStyle() {
-    return Object.assign({
-      fillStyle: this.options.fill_style,
-      strokeStyle: this.options.fill_style, // yes, this is correct for legacy compatibility
-      lineWidth: Flow.STAVE_LINE_THICKNESS,
-    }, this.style || {});
+    return Object.assign({}, defaultStyle, this.style || {});
+  }
+
+  /**
+   * Set the ledger line style for this stave
+   * @param {Object} style
+   * @param {string} [style.strokeStyle] as color value '#333333', etc...
+   * @param {number} [style.lineWidth] in fractions of pixels.
+   */
+  setLedgerLineStyle(style) {
+    this.ledgerLineStyle = style;
+  }
+
+  getLedgerLineStyle() {
+    return Object.assign({}, defaultLedgerLineStyle, this.ledgerLineStyle || {});
   }
 
   setMeasure(measure) { this.measure = measure; return this; }

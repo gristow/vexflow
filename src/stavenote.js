@@ -18,6 +18,9 @@ import { StemmableNote } from './stemmablenote';
 import { Modifier } from './modifier';
 import { Dot } from './dot';
 
+let defaultStyle;
+let defaultFlagStyle;
+
 // To enable logging for this class. Set `Vex.Flow.StaveNote.DEBUG` to `true`.
 function L(...args) { if (StaveNote.DEBUG) Vex.L('Vex.Flow.StaveNote', args); }
 
@@ -52,7 +55,61 @@ export class StaveNote extends StemmableNote {
   static get DEFAULT_LEDGER_LINE_OFFSET() { return 3; }
 
   // ## Static Methods
-  //
+
+  /**
+   * Set the default style for all StaveNote objects in VexFlow
+   * @param {Object} style
+   * @param {string} [style.fillStyle] applies to noteheads & flags
+   * @param {string} [style.strokeStyle] applies to stems
+   * @param {number} [style.lineWidth] applies to stems
+   */
+  static setDefaultStyle(style) {
+    defaultStyle = style;
+  }
+  static getDefaultStyle() {
+    return defaultStyle || {};
+  }
+
+  /**
+   * Set the default style for all noteheads objects in VexFlow
+   * @param {Object} style
+   * @param {string} [style.fillStyle]
+   * @param {string} [style.shadowColor]
+   * @param {number} [style.shadowBlur] in pixels, radius of blur
+   */
+  static setDefaultKeyStyle(style) {
+    NoteHead.setDefaultStyle(style);
+  }
+  static getDefaultKeyStyle() {
+    return NoteHead.getDefaultKeyStyle() || {};
+  }
+
+  /**
+   * Set the default stem style for all StaveNotes in VexFlow
+   * @param {Object} style a style object, see element.js setStyle()
+   * @param {string} [style.strokeStyle] a color string such as '#000000'
+   * @param {number} [style.lineWidth] in pixels
+   */
+  static setDefaultStemStyle(style) {
+    Stem.setDefaultStyle(style);
+  }
+  static getDefaultStemStyle() {
+    return Stem.getDefaultStyle() || {};
+  }
+
+  /**
+   * Set the default style for all StaveNote objects in VexFlow
+   * @param {Object} style
+   * @param {string} [style.fillStyle] applies to noteheads & flags
+   * @param {number} [style.lineWidth] applies to stems
+   */
+  static setDefaultFlagStyle(style) {
+    defaultFlagStyle = style;
+  }
+  static getDefaultFlagStyle() {
+    return defaultFlagStyle || {};
+  }
+
   // Format notes inside a ModifierContext.
   static format(notes, state) {
     if (!notes || notes.length < 2) return false;
@@ -731,24 +788,66 @@ export class StaveNote extends StemmableNote {
     super.setStyle(style);
     this.note_heads.forEach(notehead => notehead.setStyle(style));
     this.stem.setStyle(style);
+    this.setFlagStyle(style);
+    return this;
   }
 
+  /**
+   * Set the stem style
+   * @param {Object} style a style object (see element.js setStyle)
+   * @return {StaveNote} this
+   */
   setStemStyle(style) {
     const stem = this.getStem();
     stem.setStyle(style);
+    return this;
   }
+
+  /**
+   * @return {Object|undefined}
+   */
   getStemStyle() { return this.stem.getStyle(); }
 
-  setLedgerLineStyle(style) { this.ledgerLineStyle = style; }
-  getLedgerLineStyle() { return this.ledgerLineStyle; }
+  /**
+   * Set the style of this StaveNote's ledger lines.
+   * @param {Object} style a style object, see element.js setStyle
+   * @return {StaveNote} this
+   */
+  setLedgerLineStyle(style) { this.ledgerLineStyle = style; return this; }
 
-  setFlagStyle(style) { this.flagStyle = style; }
-  getFlagStyle() { return this.flagStyle; }
+  /**
+   * @return {Object}
+   */
+  getLedgerLineStyle() {
+    const staveStyle = this.stave.getLedgerLineStyle();
+    return Object.assign({}, staveStyle, this.ledgerLineStyle || {});
+  }
 
-  // Sets the notehead at `index` to the provided coloring `style`.
-  //
-  // `style` is an `object` with the following properties: `shadowColor`,
-  // `shadowBlur`, `fillStyle`, `strokeStyle`
+  /**
+   * Set the style of this StaveNote's flag
+   * @param {Object} style a style object, see element.js setStyle
+   * @return {StaveNote} this
+   */
+  setFlagStyle(style) { this.flagStyle = style; return this; }
+
+  /**
+   * @return {Object|undefined}
+   */
+  getFlagStyle() {
+    if (defaultFlagStyle) {
+      return Object.assign(defaultFlagStyle, this.flagStyle || {});
+    }
+    return this.flagStyle;
+  }
+
+  /**
+   * Sets the notehead at 'index' to the provided coloring 'style'.
+   * @param {number} index 0-based, always counted from lowest to highest note
+   * @param {Object} style a style object, see element.js setStyle()
+   * @param {string} [style.fillStyle] color string such as #333333
+   * @param {string} [style.shadowColor]
+   * @param {number} [style.shadowBlur]
+   */
   setKeyStyle(index, style) {
     this.note_heads[index].setStyle(style);
     return this;

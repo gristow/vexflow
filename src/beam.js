@@ -11,6 +11,8 @@ import { Fraction } from './fraction';
 import { Tuplet } from './tuplet';
 import { Stem } from './stem';
 
+let defaultStyle;
+
 function calculateStemDirection(notes) {
   let lineSum = 0;
   notes.forEach(note => {
@@ -36,6 +38,20 @@ const getStemSlope = (firstNote, lastNote) => {
 };
 
 export class Beam extends Element {
+  /**
+   * Set the default stem style for all StaveNotes in VexFlow
+   * @param {Object} style a style object, see element.js setStyle()
+   * @param {string} [style.strokeStyle] a color string such as '#000000'
+   * @param {number} [style.lineWidth] in pixels
+   */
+  static setDefaultStyle(style) {
+    defaultStyle = style;
+  }
+  static getDefaultStyle() {
+    return defaultStyle || {};
+  }
+
+
   // Gets the default beam groups for a provided time signature.
   // Attempts to guess if the time signature is not found in table.
   // Currently this is fairly naive.

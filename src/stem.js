@@ -8,6 +8,8 @@ import { Vex } from './vex';
 import { Element } from './element';
 import { Flow } from './tables';
 
+let defaultStyle;
+
 // To enable logging for this class. Set `Vex.Flow.Stem.DEBUG` to `true`.
 function L(...args) { if (Stem.DEBUG) Vex.L('Vex.Flow.Stem', args); }
 
@@ -28,6 +30,14 @@ export class Stem extends Element {
   }
   static get HEIGHT() {
     return Flow.STEM_HEIGHT;
+  }
+
+  static setDefaultStyle(style) {
+    defaultStyle = style;
+  }
+
+  static getDefaultStyle() {
+    return defaultStyle || {};
   }
 
   constructor(options = {}) {
