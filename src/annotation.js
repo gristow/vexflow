@@ -36,10 +36,11 @@ Vex.Flow.Annotation = (function() {
   Annotation.format = function(annotations, state) {
     if (!annotations || annotations.length === 0) return false;
 
-    var width = 0;
-    for (var i = 0; i < annotations.length; ++i) {
-      var annotation = annotations[i];
-      width = Math.max(annotation.getWidth(), width);
+    let left_shift = 0;
+    let right_shift = 0;
+    let width = 0;
+    annotations.forEach((annotation) => {
+      width = annotation.getWidth();
       if (annotation.getPosition() === Modifier.Position.ABOVE) {
         annotation.setTextLine(state.top_text_line);
         state.top_text_line++;
@@ -47,10 +48,28 @@ Vex.Flow.Annotation = (function() {
         annotation.setTextLine(state.text_line);
         state.text_line++;
       }
-    }
+      switch (annotation.justification) {
+        case Annotation.Justify.CENTER:
+        case Annotation.Justify.CENTER_STEM:
+          left_shift = Math.max(left_shift, width / 2);
+          right_shift = Math.max(right_shift, width / 2);
+          break;
+        case Annotation.Justify.LEFT:
+          left_shift = Math.max(left_shift, 0);
+          right_shift = Math.max(right_shift, width);
+          break;
+        case Annotation.Justify.RIGHT:
+          left_shift = Math.max(left_shift, width);
+          right_shift = Math.max(right_shift, 0);
+          break;
+      }
+    });
 
-    state.left_shift += width / 2;
-    state.right_shift += width / 2;
+    console.log('left_shift', left_shift);
+    console.log('right_shift', right_shift);
+    console.log('width', width);
+    state.left_shift += left_shift;
+    state.right_shift += right_shift;
     return true;
   };
 
@@ -89,7 +108,9 @@ Vex.Flow.Annotation = (function() {
     // `Annotation.Justify`.
     getJustification: function() { return this.justification; },
     setJustification: function(justification) {
-      this.justification = justification; return this; },
+      this.justification = justification;
+      return this;
+    },
 
     setY: function(y) {
       this.y = y;
@@ -128,6 +149,7 @@ Vex.Flow.Annotation = (function() {
         x = this.note.getStemX() - text_width / 2;
       }
 
+      x += this.x_shift;
       var stem_ext, spacing;
       var has_stem = this.note.hasStem();
       var stave = this.note.getStave();
