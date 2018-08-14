@@ -160,7 +160,7 @@ module.exports = function(grunt) {
         files: [
           {
             expand: true,
-            dest: '../MusicLibraries/uTheory-library/dependencies/vex',
+            dest: '../uTheory-library/dependencies/vex',
             cwd: BUILD_DIR,
             src    : ['*.js', '*.map']
           }
