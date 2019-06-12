@@ -511,6 +511,7 @@ Vex.Flow.Stave = (function() {
       var x = this.x;
       var y;
 
+      this.elem = this.context.openGroup('stave');
       // Render lines
       for (var line=0; line < num_lines; line++) {
         y = this.getYForLine(line);
@@ -540,7 +541,7 @@ Vex.Flow.Stave = (function() {
         this.context.fillText("" + this.measure, this.x - text_width / 2, y);
         this.context.restore();
       }
-
+      this.context.closeGroup();
       return this;
     },
 
