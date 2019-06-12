@@ -24,7 +24,6 @@ Vex.Flow.Accidental = (function(){
   //
   // Arrange accidentals inside a ModifierContext.
   Accidental.format = function(accidentals, state) {
-    console.log('state.left_shift', state.left_shift);
     var left_shift = state.left_shift;
     var accidental_spacing = 2;
 
@@ -49,7 +48,6 @@ Vex.Flow.Accidental = (function(){
             props_tmp = note.getKeyProps()[n];
             shiftL = (props_tmp.displaced ? note.getExtraLeftPx() : shiftL);
           }
-          console.log('shiftL', shiftL);
           prev_note = note;
       }
       if (stave !== null) {
